@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace MD5TestApplication.Command
+namespace MD5TestApplication.Commands
 {
     internal class RelayCommand : ICommand
     {
@@ -21,16 +21,16 @@ namespace MD5TestApplication.Command
 
         public RelayCommand(Action<object> command, Predicate<object> canExecute)
         {
-            this._execute = command ?? throw new ArgumentNullException(nameof(command));
-            this._canExecute = canExecute;
+            _execute = command ?? throw new ArgumentNullException(nameof(command));
+            _canExecute = canExecute;
         }
 
-        public bool CanExecute(object parameter)
+        public virtual bool CanExecute(object parameter)
         {
             return _canExecute == null || _canExecute(parameter);
         }
 
-        public void Execute(object parameter)
+        public virtual void Execute(object parameter)
         {
             _execute.Invoke(parameter);
         }
