@@ -6,4 +6,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MD5\MD5.csproj" />
+  </ItemGroup>
+
 </Project>
