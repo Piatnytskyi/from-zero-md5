@@ -2,7 +2,7 @@
 {
     public class MD5TestApplicationModel : AbstractModel
     {
-        private string _enteredInput;
+        private string _enteredInput = string.Empty;
 
         public string EnteredInput
         {
@@ -14,11 +14,11 @@
                     return;
                 }
                 _enteredInput = value;
-                RaisePropertyChanged(nameof(_enteredInput));
+                RaisePropertyChanged(nameof(EnteredInput));
             }
         }
 
-        private string _filenameInput;
+        private string _filenameInput = string.Empty;
 
         public string FilenameInput
         {
@@ -30,11 +30,11 @@
                     return;
                 }
                 _filenameInput = value;
-                RaisePropertyChanged(nameof(_filenameInput));
+                RaisePropertyChanged(nameof(FilenameInput));
             }
         }
 
-        private string _filenameToCheckInput;
+        private string _filenameToCheckInput = string.Empty;
 
         public string FilenameToCheckInput
         {
@@ -46,11 +46,11 @@
                     return;
                 }
                 _filenameToCheckInput = value;
-                RaisePropertyChanged(nameof(_filenameToCheckInput));
+                RaisePropertyChanged(nameof(FilenameToCheckInput));
             }
         }
 
-        private string _filenameChecksumInput;
+        private string _filenameChecksumInput = string.Empty;
 
         public string FilenameChecksumInput
         {
@@ -62,11 +62,27 @@
                     return;
                 }
                 _filenameChecksumInput = value;
-                RaisePropertyChanged(nameof(_filenameChecksumInput));
+                RaisePropertyChanged(nameof(FilenameChecksumInput));
             }
         }
 
-        private string _output;
+        private string _status = string.Empty;
+
+        public string Status
+        {
+            get => _status;
+            set
+            {
+                if (_status.Equals(value))
+                {
+                    return;
+                }
+                _status = value;
+                RaisePropertyChanged(nameof(Status));
+            }
+        }
+
+        private string _output = string.Empty;
 
         public string Output
         {
@@ -78,7 +94,7 @@
                     return;
                 }
                 _output = value;
-                RaisePropertyChanged(nameof(_output));
+                RaisePropertyChanged(nameof(Output));
             }
         }
 
@@ -94,7 +110,8 @@
                     return;
                 }
                 _progressDone = value;
-                RaisePropertyChanged(nameof(_progressDone));
+                RaisePropertyChanged(nameof(ProgressDone));
+                RaisePropertyChanged(nameof(IsHashingInProgress));
             }
         }
 
@@ -110,11 +127,12 @@
                     return;
                 }
                 _progressMaximum = value;
-                RaisePropertyChanged(nameof(_progressMaximum));
+                RaisePropertyChanged(nameof(ProgressMaximum));
+                RaisePropertyChanged(nameof(IsHashingInProgress));
             }
         }
 
-        public bool IsInProggress
+        public bool IsHashingInProgress
         {
             get => ProgressDone != ProgressMaximum;
         }
