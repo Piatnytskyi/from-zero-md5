@@ -142,7 +142,7 @@ namespace MD5
 
                 mDBuffer += ProcessBlock(mDBuffer.Clone(), blockNumber, X);
 
-                OnHashingProgressChanged(new HashingProgressEventArgs(blockNumber, blocksAmount));
+                OnHashingProgressChanged(new HashingProgressEventArgs(blockNumber + 1, blocksAmount));
             }
 
             return mDBuffer;
@@ -193,7 +193,7 @@ namespace MD5
 
             mDBuffer += ProcessBlock(mDBuffer.Clone(), (blocksAmount - 1), lastX);
 
-            OnHashingProgressChanged(new HashingProgressEventArgs((blocksAmount - 1), blocksAmount));
+            OnHashingProgressChanged(new HashingProgressEventArgs(blocksAmount, blocksAmount));
 
             return mDBuffer;
         }
