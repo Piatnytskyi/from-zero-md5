@@ -1,6 +1,5 @@
 ﻿using MD5;
 using MD5TestApplication.Commands;
-using MD5TestApplication.Model;
 using Microsoft.Win32;
 using System;
 using System.IO;
@@ -9,9 +8,142 @@ using System.Threading.Tasks;
 
 namespace MD5TestApplication.ViewModel
 {
-    class MD5TestApplicationViewModel
+    class MD5TestApplicationViewModel : AbstractViewModel
     {
-        public MD5TestApplicationModel MD5TestApplicationModel { get; set; } = new MD5TestApplicationModel();
+        private string _enteredInput = string.Empty;
+
+        public string EnteredInput
+        {
+            get => _enteredInput;
+            set
+            {
+                if (_enteredInput.Equals(value))
+                {
+                    return;
+                }
+                _enteredInput = value;
+                RaisePropertyChanged(nameof(EnteredInput));
+            }
+        }
+
+        private string _filenameInput = string.Empty;
+
+        public string FilenameInput
+        {
+            get => _filenameInput;
+            set
+            {
+                if (_filenameInput.Equals(value))
+                {
+                    return;
+                }
+                _filenameInput = value;
+                RaisePropertyChanged(nameof(FilenameInput));
+            }
+        }
+
+        private string _filenameToCheckInput = string.Empty;
+
+        public string FilenameToCheckInput
+        {
+            get => _filenameToCheckInput;
+            set
+            {
+                if (_filenameToCheckInput.Equals(value))
+                {
+                    return;
+                }
+                _filenameToCheckInput = value;
+                RaisePropertyChanged(nameof(FilenameToCheckInput));
+            }
+        }
+
+        private string _filenameChecksumInput = string.Empty;
+
+        public string FilenameChecksumInput
+        {
+            get => _filenameChecksumInput;
+            set
+            {
+                if (_filenameChecksumInput.Equals(value))
+                {
+                    return;
+                }
+                _filenameChecksumInput = value;
+                RaisePropertyChanged(nameof(FilenameChecksumInput));
+            }
+        }
+
+        private string _status = string.Empty;
+
+        public string Status
+        {
+            get => _status;
+            set
+            {
+                if (_status.Equals(value))
+                {
+                    return;
+                }
+                _status = value;
+                RaisePropertyChanged(nameof(Status));
+            }
+        }
+
+        private string _output = string.Empty;
+
+        public string Output
+        {
+            get => _output;
+            set
+            {
+                if (_output.Equals(value))
+                {
+                    return;
+                }
+                _output = value;
+                RaisePropertyChanged(nameof(Output));
+            }
+        }
+
+        private int _progressDone;
+
+        public int ProgressDone
+        {
+            get => _progressDone;
+            set
+            {
+                if (_progressDone.Equals(value))
+                {
+                    return;
+                }
+                _progressDone = value;
+                RaisePropertyChanged(nameof(ProgressDone));
+                RaisePropertyChanged(nameof(IsHashingInProgress));
+            }
+        }
+
+        private int _progressMaximum;
+
+        public int ProgressMaximum
+        {
+            get => _progressMaximum;
+            set
+            {
+                if (_progressMaximum.Equals(value))
+                {
+                    return;
+                }
+                _progressMaximum = value;
+                RaisePropertyChanged(nameof(ProgressMaximum));
+                RaisePropertyChanged(nameof(IsHashingInProgress));
+            }
+        }
+
+        public bool IsHashingInProgress
+        {
+            get => ProgressDone != ProgressMaximum;
+        }
 
         public RelayCommand SaveAsCommand { get; set; }
 
@@ -39,25 +171,25 @@ namespace MD5TestApplication.ViewModel
         private void SaveAs()
         {
             var saveFileDialog = new SaveFileDialog();
-            saveFileDialog.FileName = MD5TestApplicationModel.FilenameInput + "Hash";
+            saveFileDialog.FileName = FilenameInput + "Hash";
             saveFileDialog.Filter = "Binary files (*.dat;*.bin)|*.dat;*.bin";
 
             if (saveFileDialog.ShowDialog() == true)
             {
                 using BinaryWriter writer = new BinaryWriter(File.Open(saveFileDialog.FileName, FileMode.Create));
-                    writer.Write(MD5TestApplicationModel.Output);
+                    writer.Write(Output);
             }
         }
 
         private bool CanSaveAs()
         {
-            return !string.IsNullOrEmpty(MD5TestApplicationModel.Output);
+            return !string.IsNullOrEmpty(Output);
         }
 
         private void UpdateHashingProgress(object sender, HashingProgressEventArgs hashingProgressEventArgs)
         {
-            MD5TestApplicationModel.ProgressDone = hashingProgressEventArgs.Done;
-            MD5TestApplicationModel.ProgressMaximum = hashingProgressEventArgs.OutOf;
+            ProgressDone = hashingProgressEventArgs.Done;
+            ProgressMaximum = hashingProgressEventArgs.OutOf;
         }
 
         private void Hash()
@@ -65,15 +197,15 @@ namespace MD5TestApplication.ViewModel
             var mD5 = new MD5.MD5();
             mD5.HashingProgressChanged += UpdateHashingProgress;
 
-            MD5TestApplicationModel.Output = mD5.ComputeHash(Encoding.Default.GetBytes(MD5TestApplicationModel.EnteredInput ?? string.Empty)).ToString();
-            MD5TestApplicationModel.Status = "Result of hashing \"" + MD5TestApplicationModel.EnteredInput + "\":";
+            Output = mD5.ComputeHash(Encoding.Default.GetBytes(EnteredInput ?? string.Empty)).ToString();
+            Status = "Result of hashing \"" + EnteredInput + "\":";
 
             mD5.HashingProgressChanged -= UpdateHashingProgress;
         }
 
         private bool CanHash()
         {
-            return !MD5TestApplicationModel.IsHashingInProgress;
+            return !IsHashingInProgress;
         }
 
         private void ChooseFileToHash()
@@ -83,12 +215,12 @@ namespace MD5TestApplication.ViewModel
             openFileDialog.Filter = "All files (*.*)|*.*";
 
             if (openFileDialog.ShowDialog() == true)
-                MD5TestApplicationModel.FilenameInput = openFileDialog.FileName;
+                FilenameInput = openFileDialog.FileName;
         }
 
         private bool CanChooseFileToHash()
         {
-            return !MD5TestApplicationModel.IsHashingInProgress;
+            return !IsHashingInProgress;
         }
 
         private async Task HashFile()
@@ -96,17 +228,17 @@ namespace MD5TestApplication.ViewModel
             var mD5 = new MD5.MD5();
             mD5.HashingProgressChanged += UpdateHashingProgress;
 
-            MD5TestApplicationModel.Status = "Hashing of \"" + MD5TestApplicationModel.FilenameInput + "\" in progress:";
-            MD5TestApplicationModel.Output = (await mD5.ComputeHash(File.OpenRead(MD5TestApplicationModel.FilenameInput))).ToString();
-            MD5TestApplicationModel.Status = "Result of hashing \"" + MD5TestApplicationModel.FilenameInput + "\":";
+            Status = "Hashing of \"" + FilenameInput + "\" in progress:";
+            Output = (await mD5.ComputeHash(File.OpenRead(FilenameInput))).ToString();
+            Status = "Result of hashing \"" + FilenameInput + "\":";
 
             mD5.HashingProgressChanged -= UpdateHashingProgress;
         }
 
         private bool CanHashFile()
         {
-            return !MD5TestApplicationModel.IsHashingInProgress
-                && !string.IsNullOrEmpty(MD5TestApplicationModel.FilenameInput);
+            return !IsHashingInProgress
+                && !string.IsNullOrEmpty(FilenameInput);
         }
 
         private void ChooseFileAndChecksum()
@@ -116,19 +248,19 @@ namespace MD5TestApplication.ViewModel
             openFileDialog.Filter = "All files (*.*)|*.*";
 
             if (openFileDialog.ShowDialog() == true)
-                MD5TestApplicationModel.FilenameToCheckInput = openFileDialog.FileName;
+                FilenameToCheckInput = openFileDialog.FileName;
 
             var openChecksumDialog = new OpenFileDialog();
             openFileDialog.Title = "Choose Checksum";
             openChecksumDialog.Filter = "Binary files (*.dat;*.bin)|*.dat;*.bin";
 
             if (openChecksumDialog.ShowDialog() == true)
-                MD5TestApplicationModel.FilenameChecksumInput = openChecksumDialog.FileName;
+                FilenameChecksumInput = openChecksumDialog.FileName;
         }
 
         private bool CanChooseFileAndChecksum()
         {
-            return !MD5TestApplicationModel.IsHashingInProgress;
+            return !IsHashingInProgress;
         }
 
         private async Task CompareFileHashAndChecksum()
@@ -136,26 +268,26 @@ namespace MD5TestApplication.ViewModel
             var mD5 = new MD5.MD5();
             mD5.HashingProgressChanged += UpdateHashingProgress;
 
-            MD5TestApplicationModel.Status = "Hashing of \"" + MD5TestApplicationModel.FilenameToCheckInput + "\" in progress:";
-            MD5TestApplicationModel.Output = (await mD5.ComputeHash(File.OpenRead(MD5TestApplicationModel.FilenameToCheckInput))).ToString();
+            Status = "Hashing of \"" + FilenameToCheckInput + "\" in progress:";
+            Output = (await mD5.ComputeHash(File.OpenRead(FilenameToCheckInput))).ToString();
 
             mD5.HashingProgressChanged -= UpdateHashingProgress;
 
             var checksum = string.Empty;
-            using BinaryReader reader = new BinaryReader(File.Open(MD5TestApplicationModel.FilenameChecksumInput, FileMode.Open));
+            using BinaryReader reader = new BinaryReader(File.Open(FilenameChecksumInput, FileMode.Open));
                 checksum = reader.ReadString();
 
-            if (MD5TestApplicationModel.Output.Equals(checksum, StringComparison.InvariantCultureIgnoreCase))
-                MD5TestApplicationModel.Status = "File \"" + MD5TestApplicationModel.FilenameToCheckInput + "\" checksum is valid:";
+            if (Output.Equals(checksum, StringComparison.InvariantCultureIgnoreCase))
+                Status = "File \"" + FilenameToCheckInput + "\" checksum is valid:";
             else
-                MD5TestApplicationModel.Status = "File \"" + MD5TestApplicationModel.FilenameToCheckInput + "\" checksum is invalid, actual one:";
+                Status = "File \"" + FilenameToCheckInput + "\" checksum is invalid, actual one:";
         }
 
         private bool CanCompareFileHashAndChecksum()
         {
-            return !MD5TestApplicationModel.IsHashingInProgress
-                && !string.IsNullOrEmpty(MD5TestApplicationModel.FilenameToCheckInput)
-                && !string.IsNullOrEmpty(MD5TestApplicationModel.FilenameChecksumInput);
+            return !IsHashingInProgress
+                && !string.IsNullOrEmpty(FilenameToCheckInput)
+                && !string.IsNullOrEmpty(FilenameChecksumInput);
         }
     }
 }
