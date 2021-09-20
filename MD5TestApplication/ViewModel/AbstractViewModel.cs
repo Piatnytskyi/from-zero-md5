@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace MD5TestApplication.Model
+namespace MD5TestApplication.ViewModel
 {
-    public abstract class AbstractModel : INotifyPropertyChanged
+    public abstract class AbstractViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
